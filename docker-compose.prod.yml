@@ -21,7 +21,6 @@ services:
   web_service:
     build: .
     container_name: web_service
-    #context: ./server/
     command: /usr/app/server/node_modules/.bin/nodemon src/server.js
     volumes:
       - ./web_service:/usr/app/server
@@ -34,7 +33,6 @@ services:
   hubspot_service:
     build: ./hubspot_service
     container_name: hubspot_service
-    #context: ./server/
     command: /usr/app/node_modules/.bin/nodemon src/server.js
     volumes:
       - ./hubspot_service:/usr/app

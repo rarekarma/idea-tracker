@@ -1,5 +1,5 @@
 const express = require('express');
-const axios = require('axios');
+const got = require('got').default;
 
 const Idea = require('./Ideas.model.js');
 const { getAccessToken } = require('./utils.js');
@@ -8,11 +8,9 @@ const ideaRouter = express.Router();
 async function createTimeLineEvent (idea) {
   const accessToken = await getAccessToken(1);
   try {
-    await axios.post(
+    await got(
       `http://hubspot_service:8080/api/timeline/${accessToken}`,
-      {
-        idea
-      }
+      { method: 'POST', json: { idea } }
     );
   } catch (err) {
     console.log(err);

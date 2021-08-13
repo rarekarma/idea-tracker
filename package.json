@@ -1,9 +1,7 @@
 {
   "name": "idea-tracker",
   "version": "1.0.0",
-  "dependencies": {
-    "mongoose": "^5.8.10"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.29.1",
     "@typescript-eslint/parser": "^4.29.1",

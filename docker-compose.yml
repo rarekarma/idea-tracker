@@ -29,7 +29,6 @@ services:
   hubspot_service:
     build: ./hubspot_service
     container_name: hubspot_service
-    #context: ./server/
     command: /usr/app/node_modules/.bin/nodemon src/server.js
     volumes:
       - ./hubspot_service:/usr/app
@@ -51,7 +50,6 @@ services:
       - "3000:3000"
     env_file: ./.env
   mongo:
-    # upgrade to https://medium.com/faun/managing-mongodb-on-docker-with-docker-compose-26bf8a0bbae3 later
     image: mongo
     container_name: idea_tracker_database
     volumes:

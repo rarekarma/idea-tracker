@@ -1,7 +1,7 @@
 const express = require('express');
 
 const bodyParser = require('body-parser');
-const axios = require('axios');
+const got = require('got').default;
 
 const kafka = require('kafka-node');
 
@@ -49,9 +49,7 @@ app.use(bodyParser.json());
 async function getAndSaveHubSpotContacts (accessToken) {
   console.log('Getting Contacts From HubSpot');
   try {
-    const hubspotContacts = await axios.get(
-      `http://hubspot_service:8080/api/contacts/${accessToken}`
-    );
+    const hubspotContacts = await got(`http://hubspot_service:8080/api/contacts/${accessToken}`);
 
     for (const contact of hubspotContacts.data) {
       await Users.updateOne(
@@ -67,9 +65,7 @@ async function getAndSaveHubSpotContacts (accessToken) {
 async function setUpHubSpotProperties (accessToken) {
   console.log('Setting Up Properties');
   try {
-    await axios.get(
-      `http://hubspot_service:8080/api/properties/${accessToken}`
-    );
+    await got(`http://hubspot_service:8080/api/properties/${accessToken}`);
   } catch (err) {
     console.log(err);
   }
@@ -85,9 +81,9 @@ async function updateExistingHubSpotContacts (accessToken, pageNumber) {
       null,
       { skip, limit: CONTACTS_PER_PAGE }
     );
-    await axios.post(
+    await got(
       `http://hubspot_service:8080/api/contacts/update/${accessToken}`,
-      pageOfContactsFromDB
+      { method: 'POST', json: pageOfContactsFromDB }
     );
     console.log(pageOfContactsFromDB);
     if (pageOfContactsFromDB.length > 0) {
@@ -112,9 +108,9 @@ async function createExistingContacts (accessToken, pageNumber) {
       null,
       { skip, limit: CONTACTS_PER_PAGE }
     );
-    const createResponse = await axios.post(
+    const createResponse = await got(
       `http://hubspot_service:8080/api/contacts/create/${accessToken}`,
-      pageOfContactsFromDB
+      { method: 'POST', json: pageOfContactsFromDB }
     );
 
     for (const contact of createResponse.data.results) {
@@ -141,7 +137,7 @@ async function createOrUpdateCompanies (accessToken) {
   try {
     const allFactions = await Faction.find({});
     for (const faction of allFactions) {
-      const company = await axios.get(
+      const company = await got(
         `http://hubspot_service:8080/api/companies/create-or-update/${faction.domain}/${accessToken}`
       );
 

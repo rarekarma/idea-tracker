@@ -1,5 +1,5 @@
 const express = require('express');
-const axios = require('axios');
+const got = require('got').default;
 const Users = require('./Users.model.js');
 const Faction = require('./Factions.model.js');
 const { getAccessToken } = require('./utils.js');
@@ -8,9 +8,9 @@ const userRouter = express.Router();
 async function updateContactOnSave (contactToUpdate) {
   const accessToken = await getAccessToken(1);
   try {
-    await axios.put(
+    await got(
       `http://hubspot_service:8080/api/contacts/update-one/${accessToken}`,
-      { contactToUpdate }
+      { method: 'PUT', json: { contactToUpdate } }
     );
   } catch (err) {
     console.log(err);
