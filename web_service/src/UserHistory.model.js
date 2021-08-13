@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const propertyHistorySchema = new mongoose.Schema({
-  value: { type: String, default: "" },
+  value: { type: String, default: '' },
   whenModified: { type: Date, default: Date.now() }
 });
 

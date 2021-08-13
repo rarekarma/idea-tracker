@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const User = require("./Users.model");
+const mongoose = require('mongoose');
+const User = require('./Users.model.js');
 const ideaSchema = new mongoose.Schema({
   title: {
     type: String
@@ -13,6 +13,6 @@ const ideaSchema = new mongoose.Schema({
   },
   author: { type: mongoose.ObjectId, ref: User }
 });
-const Idea = mongoose.model("Idea", ideaSchema);
+const Idea = mongoose.model('Idea', ideaSchema);
 
 module.exports = Idea;

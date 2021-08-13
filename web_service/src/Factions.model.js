@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const User = require("./Users.model");
+const mongoose = require('mongoose');
+const User = require('./Users.model.js');
 const factionSchema = new mongoose.Schema({
   domain: {
     type: String,
@@ -13,6 +13,6 @@ const factionSchema = new mongoose.Schema({
   },
   members: [{ type: mongoose.ObjectId, ref: User }]
 });
-const Faction = mongoose.model("Faction", factionSchema);
+const Faction = mongoose.model('Faction', factionSchema);
 
 module.exports = Faction;

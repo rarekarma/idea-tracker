@@ -1,11 +1,11 @@
-const express = require("express");
-const axios = require("axios");
-const Users = require("./Users.model");
-const Faction = require("./Factions.model");
-const { getAccessToken } = require("./utils");
-var userRouter = express.Router();
+const express = require('express');
+const axios = require('axios');
+const Users = require('./Users.model.js');
+const Faction = require('./Factions.model.js');
+const { getAccessToken } = require('./utils.js');
+const userRouter = express.Router();
 
-const updateContactOnSave = async contactToUpdate => {
+async function updateContactOnSave (contactToUpdate) {
   const accessToken = await getAccessToken(1);
   try {
     await axios.put(
@@ -15,9 +15,9 @@ const updateContactOnSave = async contactToUpdate => {
   } catch (err) {
     console.log(err);
   }
-};
+}
 
-userRouter.get("/", async (req, res, next) => {
+userRouter.get('/', async (req, res, next) => {
   try {
     const users = await Users.find({});
     res.send(users);
@@ -26,20 +26,20 @@ userRouter.get("/", async (req, res, next) => {
   }
 });
 
-userRouter.delete("/", async (req, res, next) => {
+userRouter.delete('/', async (req, res, next) => {
   try {
     await Users.deleteMany({});
-    res.send("Deleted all users");
+    res.send('Deleted all users');
   } catch (err) {
     next(err);
   }
 });
 
-userRouter.post("/", async (req, res, next) => {
+userRouter.post('/', async (req, res, next) => {
   const user = req.body;
   const { email } = user;
   console.log(user);
-  const domain = email.substring(email.lastIndexOf("@") + 1);
+  const domain = email.substring(email.lastIndexOf('@') + 1);
   const newUser = new Users(user);
   try {
     const savedUser = await newUser.save();
@@ -54,24 +54,24 @@ userRouter.post("/", async (req, res, next) => {
     );
     res.send({ savedUser, faction });
   } catch (err) {
-    if (err.code === 11000) {
-      res.status(409).send("User with email address already exists");
+    if (err.code === 11_000) {
+      res.status(409).send('User with email address already exists');
     }
 
     next(err);
   }
 });
 
-userRouter.put("/", async (req, res, next) => {
+userRouter.put('/', async (req, res, next) => {
   const user = req.body;
-  console.log("user", user);
+  console.log('user', user);
   try {
     const updatedUser = await Users.findOneAndUpdate(
       { email: user.email },
       user,
       { new: true }
     );
-    console.log("updatedUser", updatedUser);
+    console.log('updatedUser', updatedUser);
 
     res.send({ updatedUser });
 
@@ -81,9 +81,9 @@ userRouter.put("/", async (req, res, next) => {
   }
 });
 
-userRouter.post("/login", async (req, res, next) => {
-  const user = req.body;
-  const { email, password } = user;
+userRouter.post('/login', async (req, res, next) => {
+  const userFromBody = req.body;
+  const { email, password } = userFromBody;
   try {
     const matchedUser = await Users.findOne({ email });
     if (matchedUser) {
@@ -91,10 +91,10 @@ userRouter.post("/login", async (req, res, next) => {
       if (isValidPassword) {
         matchedUser.numLogins++;
         matchedUser.lastLoginDate = new Date();
-        let updatedUser = await matchedUser.save();
-        //delete updatedUser.password;
-        //console.log(updatedUser);
-        safeUser = updatedUser.toObject();
+
+        await matchedUser.save();
+        const safeUser = matchedUser.toObject();
+
         delete safeUser.password;
         res.status(200).send(safeUser);
       } else {

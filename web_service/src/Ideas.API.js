@@ -1,24 +1,27 @@
-const express = require("express");
-const Idea = require("./Ideas.model");
-var ideaRouter = express.Router();
+const express = require('express');
+const axios = require('axios');
 
-const createTimeLineEvent = async (idea) => {
+const Idea = require('./Ideas.model.js');
+const { getAccessToken } = require('./utils.js');
+const ideaRouter = express.Router();
+
+async function createTimeLineEvent (idea) {
   const accessToken = await getAccessToken(1);
   try {
     await axios.post(
       `http://hubspot_service:8080/api/timeline/${accessToken}`,
       {
-        idea,
+        idea
       }
     );
   } catch (err) {
     console.log(err);
   }
-};
+}
 
-ideaRouter.get("/", async (req, res, next) => {
+ideaRouter.get('/', async (req, res, next) => {
   try {
-    const allIdeas = await Idea.find({}).populate("author").exec();
+    const allIdeas = await Idea.find({}).populate('author').exec();
 
     res.send(allIdeas);
   } catch (err) {
@@ -26,12 +29,12 @@ ideaRouter.get("/", async (req, res, next) => {
   }
 });
 
-ideaRouter.post("/", async (req, res, next) => {
+ideaRouter.post('/', async (req, res, next) => {
   const idea = req.body;
   console.log(idea);
   try {
     const dbResponse = await Idea.create(idea);
-    const populatedIdea = await dbResponse.populate("author").execPopulate();
+    const populatedIdea = await dbResponse.populate('author').execPopulate();
     res.send(populatedIdea);
     createTimeLineEvent(populatedIdea);
   } catch (err) {
@@ -39,10 +42,10 @@ ideaRouter.post("/", async (req, res, next) => {
   }
 });
 
-ideaRouter.delete("/", async (req, res, next) => {
+ideaRouter.delete('/', async (req, res, next) => {
   try {
     await Idea.deleteMany({});
-    res.send("All Ideas deleted");
+    res.send('All Ideas deleted');
   } catch (err) {
     next(err);
   }
