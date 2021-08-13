@@ -2,7 +2,7 @@
 
 # Setup and build the client
 
-FROM node:12.10.0-alpine as client
+FROM node:14-alpine as client
 
 WORKDIR /usr/app/client/
 COPY client/package.json ./
@@ -15,7 +15,7 @@ RUN echo "just ran build"
 
 # Setup the server
 
-FROM node:12.10.0-alpine
+FROM node:14-alpine
 
 WORKDIR /usr/app/
 COPY --from=client /usr/app/client/build/ ./client/build/
