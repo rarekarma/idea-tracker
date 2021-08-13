@@ -49,8 +49,8 @@ app.use(bodyParser.json());
 async function getAndSaveHubSpotContacts (accessToken) {
   console.log('Getting Contacts From HubSpot');
   try {
-    const hubspotContacts = await got(`http://hubspot_service:8080/api/contacts/${accessToken}`);
-
+    const hubspotContacts = await got(`http://hubspot_service:8080/api/contacts/${accessToken}`, { resolveBodyOnly: true });
+    console.log({ hubspotContacts });
     for (const contact of hubspotContacts.data) {
       await Users.updateOne(
         { email: contact.properties.email },
@@ -81,11 +81,12 @@ async function updateExistingHubSpotContacts (accessToken, pageNumber) {
       null,
       { skip, limit: CONTACTS_PER_PAGE }
     );
+
     await got(
       `http://hubspot_service:8080/api/contacts/update/${accessToken}`,
       { method: 'POST', json: pageOfContactsFromDB }
     );
-    console.log(pageOfContactsFromDB);
+
     if (pageOfContactsFromDB.length > 0) {
       pageNumber++;
       return await updateExistingHubSpotContacts(accessToken, pageNumber);
@@ -110,7 +111,7 @@ async function createExistingContacts (accessToken, pageNumber) {
     );
     const createResponse = await got(
       `http://hubspot_service:8080/api/contacts/create/${accessToken}`,
-      { method: 'POST', json: pageOfContactsFromDB }
+      { method: 'POST', json: pageOfContactsFromDB, resolveBodyOnly: true }
     );
 
     for (const contact of createResponse.data.results) {
@@ -138,7 +139,8 @@ async function createOrUpdateCompanies (accessToken) {
     const allFactions = await Faction.find({});
     for (const faction of allFactions) {
       const company = await got(
-        `http://hubspot_service:8080/api/companies/create-or-update/${faction.domain}/${accessToken}`
+        `http://hubspot_service:8080/api/companies/create-or-update/${faction.domain}/${accessToken}`,
+        { resolveBodyOnly: true }
       );
 
       await new Promise(resolve => setTimeout(resolve, 1000));
