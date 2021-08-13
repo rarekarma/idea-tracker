@@ -52,6 +52,7 @@ async function getAndSaveHubSpotContacts (accessToken) {
     const hubspotContacts = await axios.get(
       `http://hubspot_service:8080/api/contacts/${accessToken}`
     );
+
     for (const contact of hubspotContacts.data) {
       await Users.updateOne(
         { email: contact.properties.email },

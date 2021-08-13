@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const userHistorySchema = require('./UserHistory.model');
+const userHistorySchema = require('./UserHistory.model.js');
 const SALT_WORK_FACTOR = 10;
 
 const userSchema = new mongoose.Schema({
