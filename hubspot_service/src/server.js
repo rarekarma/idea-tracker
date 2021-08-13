@@ -7,6 +7,7 @@ const app = express();
 const apiRouter = express.Router();
 
 app.use(bodyParser.json());
+apiRouter.use(bodyParser.json());
 
 const hubspotClient = new hubspot.Client();
 

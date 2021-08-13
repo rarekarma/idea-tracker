@@ -3,7 +3,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const got = require('got');
 
-const kafka = require('kafka-node');
 
 const connectDb = require('./connection.js');
 
@@ -11,7 +10,6 @@ const Account = require('./Accounts.model.js');
 const Faction = require('./Factions.model.js');
 const Users = require('./Users.model.js');
 const userRouter = require('./Users.API.js');
-const userHandler = require('./Users.webhook.js');
 const ideaRouter = require('./Ideas.API.js');
 const { hubspotClient } = require('./utils.js');
 
@@ -22,24 +20,8 @@ const {
   CLIENT_ID,
   BASE_URL,
   SCOPES,
-  CLIENT_SECRET,
-  KAFKA_BROKER_LIST
+  CLIENT_SECRET
 } = process.env;
-
-const client = new kafka.KafkaClient({ kafkaHost: KAFKA_BROKER_LIST });
-
-const consumer = new kafka.Consumer(client, [
-  { topic: 'contact.propertyChange' }
-]);
-
-consumer.on('message', message => {
-  console.log(message);
-  userHandler(message);
-});
-
-consumer.on('error', err => {
-  console.log(err);
-});
 
 
 const REDIRECT_URL = `${BASE_URL}/oauth/callback`;
