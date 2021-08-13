@@ -59,7 +59,7 @@ apiRouter.post("/contacts/create/:accessToken", async (req, res, next) => {
     };
   });
   try {
-    const createResponse = await hubspotClient.crm.contacts.batchApi.createBatch(
+    const createResponse = await hubspotClient.crm.contacts.batchApi.create(
       { inputs }
     );
     console.log(createResponse.body);
@@ -86,7 +86,7 @@ apiRouter.post("/contacts/update/:accessToken", async (req, res, next) => {
   });
 
   try {
-    const updateResponse = await hubspotClient.crm.contacts.batchApi.updateBatch(
+    const updateResponse = await hubspotClient.crm.contacts.batchApi.update(
       { inputs }
     );
     console.log(updateResponse.body);
@@ -164,7 +164,7 @@ apiRouter.get("/properties/:accessToken", async (req, res, next) => {
       },
     ];
     try {
-      return await hubspotClient.crm.properties.batchApi.createBatch(
+      return await hubspotClient.crm.properties.batchApi.create(
         "contacts",
         {
           inputs,
