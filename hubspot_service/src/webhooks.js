@@ -1,35 +1,39 @@
-const express = require("express");
-const kafka = require("kafka-node");
+const express = require('express');
+const kafka = require('kafka-node');
 
 const { KAFKA_BROKER_LIST } = process.env;
-const Producer = kafka.Producer;
+const { Producer } = kafka;
 const client = new kafka.KafkaClient({ kafkaHost: KAFKA_BROKER_LIST });
 const producer = new Producer(client);
 const admin = new kafka.Admin(client);
 
 const TOPICS = [
   {
-    topic: "contact.propertyChange",
+    topic: 'contact.propertyChange',
     partitions: 1,
-    replicationFactor: 1,
-  },
+    replicationFactor: 1
+  }
 ];
 
-producer.on("ready", () => {
-  console.log("kafka produce is ready");
+producer.on('ready', () => {
+  console.log('kafka produce is ready');
   admin.createTopics(TOPICS, (err, res) => {
-    console.log(res);
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(res);
+    }
   });
 });
 
 const webhookRouter = express.Router();
 
-webhookRouter.post("/platform", (req, res, next) => {
+webhookRouter.post('/platform', (req, res, next) => {
   // validate webhook signature
   const payloads = req.body.map((event) => {
     return {
       topic: event.subscriptionType,
-      messages: JSON.stringify(event),
+      messages: JSON.stringify(event)
     };
   });
   producer.send(payloads, (err, data) => {
@@ -38,7 +42,7 @@ webhookRouter.post("/platform", (req, res, next) => {
     }
     console.log(data);
   });
-  res.send("Ok");
+  res.send('Ok');
 });
 
 module.exports = webhookRouter;

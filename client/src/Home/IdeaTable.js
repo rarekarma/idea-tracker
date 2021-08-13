@@ -19,7 +19,7 @@ const IdeaTable = props => {
       setIdeas(resultText);
     };
     fetchIdeas();
-  }, []);
+  }, [setIdeas]);
   for (const idea in ideas) {
     console.log(idea.author);
   }
