@@ -129,8 +129,12 @@ apiRouter.get('/properties/:accessToken', async (req, res, next) => {
 
   hubspotClient.setAccessToken(accessToken);
 
-  const result = await checkForPropInfo({ propertyGroupInfo });
-  res.send(result);
+  try {
+    const result = await checkForPropInfo({ propertyGroupInfo });
+    res.send(result);
+  } catch (err) {
+    next(err);
+  }
 });
 
 apiRouter.post('/timeline/:accessToken', async (req, res, next) => {
@@ -168,6 +172,36 @@ app.use((err, req, res, next) => {
 console.log('process environment', process.env.NODE_ENV);
 app.listen(process.env.PORT || 8080, () => {});
 
+async function checkForPropInfo ({ propertyGroupInfo }) {
+  const existingPropertyGroups = await hubspotClient.crm.properties.groupsApi.getAll(
+    'contacts'
+  );
+
+  const groupExists = existingPropertyGroups.body.results.find(
+    (group) => group.name === propertyGroupInfo.name
+  );
+  if (groupExists) {
+    const allProperties = await getAllExistingProperties([], 0);
+    const existingProperties = allProperties.filter((property) => {
+      property.name === 'faction_rank' ||
+        property.name === 'num_ideas_submitted';
+    });
+    console.log(existingProperties);
+    if (existingProperties.length === 0) {
+      await createProperty(propertyGroupInfo.name);
+      return 'Properties Created';
+    } else {
+      return 'Properties Already Existed';
+    }
+  } else {
+    await hubspotClient.crm.properties.groupsApi.create(
+      'contacts',
+      propertyGroupInfo
+    );
+    const propertiesResponse = await createProperty(propertyGroupInfo.name);
+    return propertiesResponse;
+  }
+}
 async function getAllContacts (offset, startingContacts) {
   const pageOfContacts = await hubspotClient.crm.contacts.basicApi.getPage(
     100,
@@ -230,36 +264,5 @@ async function getAllExistingProperties (startingProperties, offset) {
     );
   } else {
     return endingProperties;
-  }
-}
-
-async function checkForPropInfo ({ propertyGroupInfo }) {
-  const existingPropertyGroups = await hubspotClient.crm.properties.groupsApi.getAll(
-    'contacts'
-  );
-
-  const groupExists = existingPropertyGroups.body.results.find(
-    (group) => group.name === propertyGroupInfo.name
-  );
-  if (groupExists) {
-    const allProperties = await getAllExistingProperties([], 0);
-    const existingProperties = allProperties.filter((property) => {
-      property.name === 'faction_rank' ||
-        property.name === 'num_ideas_submitted';
-    });
-    console.log(existingProperties);
-    if (existingProperties.length === 0) {
-      await createProperty(propertyGroupInfo.name);
-      return 'Properties Created';
-    } else {
-      return 'Properties Already Existed';
-    }
-  } else {
-    await hubspotClient.crm.properties.groupsApi.create(
-      'contacts',
-      propertyGroupInfo
-    );
-    const propertiesResponse = await createProperty(propertyGroupInfo.name);
-    return propertiesResponse;
   }
 }
