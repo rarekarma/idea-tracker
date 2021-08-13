@@ -15,7 +15,7 @@ RUN npm rebuild bcrypt --build-from-source
 
 COPY . .
 
-RUN echo "copied everythign over for server"
+RUN echo "copied everything over for server"
 
 EXPOSE 8080
 

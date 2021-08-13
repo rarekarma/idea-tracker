@@ -10,7 +10,7 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN echo "copied everythign over for server"
+RUN echo "copied everything over for server"
 
 EXPOSE 8080
 
