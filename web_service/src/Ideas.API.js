@@ -1,5 +1,5 @@
 const express = require('express');
-const got = require('got').default;
+const got = require('got');
 
 const Idea = require('./Ideas.model.js');
 const { getAccessToken } = require('./utils.js');

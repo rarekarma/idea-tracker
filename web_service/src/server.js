@@ -1,7 +1,7 @@
 const express = require('express');
 
 const bodyParser = require('body-parser');
-const got = require('got').default;
+const got = require('got');
 
 const kafka = require('kafka-node');
 
