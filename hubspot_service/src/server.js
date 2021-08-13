@@ -68,9 +68,12 @@ apiRouter.post("/contacts/create/:accessToken", async (req, res, next) => {
     next(err);
   }
 });
+
 apiRouter.post("/contacts/update/:accessToken", async (req, res, next) => {
   const { accessToken } = req.params;
+  
   hubspotClient.setAccessToken(accessToken);
+
   const contactsToUpdate = req.body;
   const inputs = contactsToUpdate.map((contact) => {
     return {
@@ -171,7 +174,9 @@ apiRouter.get("/properties/:accessToken", async (req, res, next) => {
       next(err);
     }
   };
+  
   hubspotClient.setAccessToken(accessToken);
+
   const checkForPropInfo = async () => {
     const existingPropertyGroups = await hubspotClient.crm.properties.groupsApi.getAll(
       "contacts"
