@@ -7,7 +7,7 @@ FROM node:14-alpine as client
 WORKDIR /usr/app/client/
 COPY client/package.json ./
 COPY client/yarn.lock ./
-RUN yarn install
+RUN yarn
 COPY client/ ./
 RUN yarn build
 RUN echo "just ran build"
@@ -24,7 +24,7 @@ WORKDIR /usr/app/server/
 COPY web_service/package.json ./
 COPY web_service/yarn.lock ./
 RUN apk --no-cache add --virtual builds-deps build-base python
-RUN yarn install
+RUN yarn
 COPY web_service/ ./
 
 EXPOSE 8080
