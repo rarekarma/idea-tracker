@@ -31,9 +31,8 @@ app.use(bodyParser.json());
 async function getAndSaveHubSpotContacts (accessToken) {
   console.log('Getting Contacts From HubSpot');
   try {
-    const hubspotContacts = await got(`http://hubspot_service:8080/api/contacts/${accessToken}`, { resolveBodyOnly: true });
-    console.log({ hubspotContacts });
-    for (const contact of hubspotContacts.data) {
+    const hubspotContacts = await got(`http://hubspot_service:8080/api/contacts/${accessToken}`, { resolveBodyOnly: true, responseType: 'json' });
+    for (const contact of hubspotContacts) {
       await Users.updateOne(
         { email: contact.properties.email },
         { hubspotContactId: contact.id }
@@ -96,7 +95,7 @@ async function createExistingContacts (accessToken, pageNumber) {
       { method: 'POST', json: pageOfContactsFromDB, resolveBodyOnly: true }
     );
 
-    for (const contact of createResponse.data.results) {
+    for (const contact of createResponse.results) {
       await Users.findOneAndUpdate(
         { email: contact.email },
         { hubspotContactId: contact.id }
@@ -122,11 +121,11 @@ async function createOrUpdateCompanies (accessToken) {
     for (const faction of allFactions) {
       const company = await got(
         `http://hubspot_service:8080/api/companies/create-or-update/${faction.domain}/${accessToken}`,
-        { resolveBodyOnly: true }
+        { resolveBodyOnly: true, responseType: 'json' }
       );
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('company', company.data);
+      await sleep(1000);
+      console.log('company', company);
     }
   } catch (err) {
     console.log(err.message);
@@ -162,6 +161,7 @@ app.get('/oauth/callback', async (req, res, next) => {
       CLIENT_SECRET
     );
     const { accessToken, refreshToken, expiresIn } = tokensResponse.body;
+
     const expiresAt = new Date(Date.now() + expiresIn);
 
     await Account.updateOne(
@@ -196,3 +196,7 @@ app.listen(process.env.PORT || 8080, () => {
     console.log('database connected');
   });
 });
+
+async function sleep (milliseconds) {
+  await new Promise((resolve) => setTimeout(resolve, milliseconds));
+}

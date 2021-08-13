@@ -16,37 +16,40 @@ async function userHandler (message) {
 
   try {
     const user = await Users.findOne({ hubspotContactId: objectId });
-    if (user) {
-      console.log('propertyName', propertyName);
-      const fieldToCheck = fieldMapping[propertyName];
-      console.log('fieldToCheck', fieldToCheck);
-      if (fieldToCheck) {
-        if (user[fieldToCheck] !== propertyValue) {
-          // check history
-          console.log(
-            'whenmodifed',
-            user.propertyHistory[`${fieldToCheck}History`][0].whenModified
-          );
-          console.log('occurredAt', occurredAt);
-          const lastModifiedFromDB = Date.parse(
-            user.propertyHistory[`${fieldToCheck}History`][0].whenModified
-          );
-          const lastModifiedFromHS = Date.parse(occurredAt);
-          if (lastModifiedFromDB < lastModifiedFromHS) {
-            user[fieldToCheck] = propertyValue;
-            await user.save();
-          } else {
-            console.log('field value is less current that what is saved');
-          }
-        } else {
-          console.log('field values already match');
-        }
-      } else {
-        console.log('Not a mapped property');
-      }
-    } else {
+    if (!user) {
       console.log('Does not exist in database, ignoring');
+      return;
     }
+    console.log('propertyName', propertyName);
+    const fieldToCheck = fieldMapping[propertyName];
+    console.log('fieldToCheck', fieldToCheck);
+
+    if (!fieldToCheck) {
+      console.log('Not a mapped property');
+      return;
+    }
+    if (user[fieldToCheck] === propertyValue) {
+      console.log('field values already match');
+      return;
+    }
+    // check history
+    console.log(
+      'whenmodifed',
+      user.propertyHistory[`${fieldToCheck}History`][0].whenModified
+    );
+    console.log('occurredAt', occurredAt);
+    const lastModifiedFromDB = Date.parse(
+      user.propertyHistory[`${fieldToCheck}History`][0].whenModified
+    );
+
+    const lastModifiedFromHS = Date.parse(occurredAt);
+    if (lastModifiedFromDB >= lastModifiedFromHS) {
+      console.log('field value is less current that what is saved');
+      return;
+    }
+
+    user[fieldToCheck] = propertyValue;
+    await user.save();
   } catch (err) {
     console.log(err);
   }

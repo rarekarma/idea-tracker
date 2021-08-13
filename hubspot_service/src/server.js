@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const hubspot = require('@hubspot/api-client');
-const webhookRouter = require('./webhooks.js');
 
 const app = express();
 const apiRouter = express.Router();
@@ -89,35 +88,31 @@ apiRouter.put('/contacts/update-one/:accessToken', (req, res, next) => {
   }
 });
 
-apiRouter.get(
-  '/companies/create-or-update/:faction/:accessToken',
-  async (req, res, next) => {
-    const { faction, accessToken } = req.params;
-    hubspotClient.setAccessToken(accessToken);
-    const searchCriteria = {
-      filterGroups: [
-        {
-          filters: [{ propertyName: 'domain', operator: 'EQ', value: faction }]
-        }
-      ]
-    };
-    try {
-      const companiesByDomain = await hubspotClient.crm.companies.searchApi.doSearch(
-        searchCriteria
-      );
-      if (companiesByDomain.body.results.length > 0) {
-        res.send(companiesByDomain.body.results[0]);
-      } else {
-        const newCompany = await hubspotClient.crm.companies.basicApi.create({
-          properties: { domain: faction }
-        });
-        res.send(newCompany.body);
+apiRouter.get('/companies/create-or-update/:faction/:accessToken', async (req, res, next) => {
+  const { faction, accessToken } = req.params;
+  hubspotClient.setAccessToken(accessToken);
+  const searchCriteria = {
+    filterGroups: [
+      {
+        filters: [{ propertyName: 'domain', operator: 'EQ', value: faction }]
       }
-    } catch (err) {
-      console.log(err);
-      next(err);
+    ]
+  };
+  try {
+    const companiesByDomain = await hubspotClient.crm.companies.searchApi.doSearch(searchCriteria);
+    if (companiesByDomain.body.results.length > 0) {
+      res.send(companiesByDomain.body.results[0]);
+    } else {
+      const newCompany = await hubspotClient.crm.companies.basicApi.create({
+        properties: { domain: faction }
+      });
+      res.send(newCompany.body);
     }
+  } catch (err) {
+    console.log(err);
+    next(err);
   }
+}
 );
 
 apiRouter.get('/properties/:accessToken', async (req, res, next) => {
@@ -164,7 +159,6 @@ apiRouter.post('/timeline/:accessToken', async (req, res, next) => {
 
 app.use('/api', apiRouter);
 
-app.use('/webhook', webhookRouter);
 
 app.use((err, req, res, next) => {
   res.status(500).send(err.toString());

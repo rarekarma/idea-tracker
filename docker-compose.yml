@@ -3,7 +3,7 @@ services:
   web_service:
     build: ./web_service
     container_name: web_service
-    command: /usr/app/node_modules/.bin/nodemon src/server.js
+    command: /usr/app/node_modules/.bin/nodemon --inspect=0.0.0.0 src/server.js
     volumes:
       - ./web_service:/usr/app
       - /usr/app/node_modules
@@ -15,12 +15,14 @@ services:
   hubspot_service:
     build: ./hubspot_service
     container_name: hubspot_service
-    command: /usr/app/node_modules/.bin/nodemon src/server.js
+    command: /usr/app/node_modules/.bin/nodemon --inspect=0.0.0.0 src/server.js
     volumes:
       - ./hubspot_service:/usr/app
       - /usr/app/node_modules
     expose:
       - "8080"
+    ports:
+      - "9230:9229"
     env_file: ./.env
     depends_on:
       - mongo
@@ -34,6 +36,7 @@ services:
       - web_service
     ports:
       - "3000:3000"
+      - "9229:9229"
     env_file: ./.env
   mongo:
     image: mongo
