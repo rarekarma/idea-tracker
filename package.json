@@ -10,7 +10,7 @@
     "eslint-plugin-import": "^2.24.0",
     "eslint-plugin-mocha-no-only": "^1.1.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-unicorn": "^35.0.0",
+    "eslint-plugin-unicorn": "^36.0.0",
     "eslint-plugin-you-dont-need-lodash-underscore": "^6.12.0",
     "typescript": "^4.3.5"
   }
